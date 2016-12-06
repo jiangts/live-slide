@@ -5,7 +5,8 @@
                  [re-frame "0.8.0"]
                  [re-frisk "0.3.1"]
                  [garden "1.3.2"]
-                 [ns-tracker "0.3.0"]]
+                 [ns-tracker "0.3.0"]
+                 [mount "0.1.11"]]
 
   :plugins [[lein-cljsbuild "1.1.4"]
             [lein-garden "0.2.8"]]
@@ -20,19 +21,21 @@
 
   :figwheel {:css-dirs ["resources/public/css"]}
 
-  :garden {:builds [{:id           "screen"
-                     :source-paths ["src/clj"]
-                     :stylesheet   lsd.css/screen
-                     :compiler     {:output-to     "resources/public/css/screen.css"
-                                    :pretty-print? true}}]}
-
   :profiles
   {:dev
-   {:dependencies [[binaryage/devtools "0.8.2"]]
-
-    :plugins      [[lein-figwheel "0.5.7"]
+   {:dependencies [[binaryage/devtools "0.8.2"]
+                   [figwheel-sidecar "0.5.8"]
+                   [com.cemerick/piggieback "0.2.1"]]
+    :plugins      [[lein-figwheel "0.5.8"]
                    [lein-doo "0.1.7"]]
-    }}
+    ;; need to add dev source path here to get user.clj loaded
+    :source-paths ["src/cljs" "dev"]
+    ;; for CIDER
+    ;; :plugins [[cider/cider-nrepl "0.12.0"]]
+    :repl-options {; for nREPL dev you really need to limit output
+                   :init (set! *print-length* 50)
+                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}}
+   }
 
   :cljsbuild
   {:builds

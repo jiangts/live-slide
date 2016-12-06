@@ -1,11 +1,11 @@
 (ns lsd.core
-    (:require [reagent.core :as reagent]
-              [re-frame.core :as re-frame]
-              [re-frisk.core :refer [enable-re-frisk!]]
-              [lsd.events]
-              [lsd.subs]
-              [lsd.views :as views]
-              [lsd.config :as config]))
+  (:require [reagent.core :as reagent]
+            [re-frame.core :as re-frame]
+            [re-frisk.core :refer [enable-re-frisk!]]
+            [lsd.events]
+            [lsd.subs]
+            [lsd.views :as views]
+            [lsd.config :as config]))
 
 
 (defn dev-setup []
