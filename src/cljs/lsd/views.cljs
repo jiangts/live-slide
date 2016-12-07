@@ -1,16 +1,21 @@
 (ns lsd.views
   (:require [re-frame.core :as rf]
-            [reagent.core :as r])
+            [reagent.core :as r]
             [cljsjs.react-bootstrap]
-            [cljs.pprint :refer [pprint]])
-  (:require-macros [lsd.core :refer [require-react-reagent]])
+            [cljsjs.simplemde]
+            [cljs.pprint :refer [pprint]]
+            [goog.dom :as gdom])
+  (:require-macros [lsd.core :refer [require-react-reagent slurp-dep]]))
 
-(require-react-reagent js/ReactBootstrap
+(def RB js/ReactBootstrap)
+(def MDE js/SimpleMDE)
+
+(require-react-reagent RB
                        [Navbar Nav Navbar.Header Navbar.Brand Navbar.Collapse NavItem
-                        NavDropdown MenuItem NavItem])
+                        NavDropdown MenuItem Navbar.Toggle])
+
 (defn left-nav []
   [Nav
-   [NavItem {:event-key (gensym) :href "#"} "Link"]
    [NavItem {:event-key (gensym) :href "#"} "Link"]
    [NavDropdown {:event-key (gensym)
                  :id "some-dropdown"
@@ -23,38 +28,66 @@
 
 (defn right-nav []
   [Nav {:pull-right true}
-   [NavItem {:event-key (gensym) :href "#"} "Link Right"]
-   [NavItem {:event-key (gensym) :href "#"} "Link Right"]])
+   [NavItem {:event-key (gensym) :href "#"} "Log In"]])
 
 (defn navbar []
-  [Navbar {:style {:margin-bottom 0}
-           #_#_:inverse true
-           #_#_:collapse-on-select true}
+  [Navbar {:fluid true
+           :collapse-on-select true}
    [Navbar.Header
     [Navbar.Brand
      [:a {:href "#"}
-      "React-Bootstrap"]]]
+      "Live Slide"]]
+    #_[Navbar.Toggle]]
    [Navbar.Collapse
-    [left-nav]
+    #_[left-nav]
     [right-nav]]])
 
+(defn editor []
+  (r/create-class
+    {:display-name "editor"
+     :component-did-mount
+     (fn []
+       (let [mde (MDE. (clj->js {:element (gdom/getElement "editor")
+                                 :shortcuts { :drawTable "Cmd-Alt-T" }}))]
+         (-> mde
+           (aget "codemirror")
+           ;; TODO OCALL
+           (.on "change" #(rf/dispatch [:mde/change (.value mde)]))))
+       ;; yeah, pretty absurd
+       (let [g gdom/getElementByClass
+             f #(aget % "offsetHeight")
+             left-pane (g "left-pane")
+             code-mirror (g "CodeMirror")
+             editor-statusbar (g "editor-statusbar")
+             editor-toolbar (g "editor-toolbar")
+             height (- (f left-pane) (+ (f editor-statusbar) (f editor-toolbar)))]
+         (aset code-mirror "style" "height" (str height "px"))))
+     :reagent-render
+     (fn []
+       [:div
+        [:textarea#editor (slurp-dep "README.md")]])}))
+
 (defn left-pane []
-  [:div {:style {:width "50%"
-                 :float :left
-                 :height "100%"
-                 :background-color "red"}}
-   "hi"])
+  [:div.left-pane {:style {:width "50%"
+                           :float :left
+                           :height "100%"}}
+   [editor]])
 
 (defn right-pane []
-  [:div {:style {:width "50%"
-                 :float :right
-                 :height "100%"
-                 :background-color "green"}}
-   "bye"])
+  [:iframe#slide-frame {:style {:width "50%"
+                                 :float :right
+                                 :height "100%"
+                                 :border :none}
+                         :src "/slides.html"}])
 
 (defn main-panel []
-  [:div {:style {:height "100%"}}
+  [:div
    [navbar]
-   [left-pane]
-   [right-pane]])
+   [:div {:style {:position :absolute
+                  :top 54
+                  :left 0
+                  :right 0
+                  :bottom 0}}
+    [left-pane]
+    [right-pane]]])
 

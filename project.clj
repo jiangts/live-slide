@@ -7,7 +7,9 @@
                  [garden "1.3.2"]
                  [ns-tracker "0.3.0"]
                  [mount "0.1.11"]
-                 [cljsjs/react-bootstrap "0.30.6-0"]]
+                 [cljsjs/react-bootstrap "0.30.6-0"]
+                 [cljsjs/simplemde "1.11.2-0"]
+                 [cljsjs/to-markdown "1.3.0-0"]]
 
   :plugins [[lein-cljsbuild "1.1.4"]
             [lein-garden "0.2.8"]]
@@ -41,7 +43,7 @@
   :cljsbuild
   {:builds
    [{:id           "dev"
-     :source-paths ["src/cljs"]
+     :source-paths ["src/cljs" "src/clj"]
      :figwheel     {:on-jsload "lsd.core/mount-root"}
      :compiler     {:main                 lsd.core
                     :output-to            "resources/public/js/compiled/app.js"
