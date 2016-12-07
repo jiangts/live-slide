@@ -53,7 +53,7 @@
            [vsm k])
   :stop (let [[vsm k] @vsw]
           (gevt/unlistenByKey k)
-          (ocall vsm :dispose)))
+          (.dispose vsm)))
 
 (defn editor []
   (r/create-class
@@ -63,9 +63,9 @@
        (let [mde (MDE. (clj->js {:element (gdom/getElement "editor")
                                  :shortcuts { :drawTable "Cmd-Alt-T" }}))]
          (-> mde
-           (aget "codemirror")
-           (ocall :on "change" #(rf/dispatch [:mde/change (.value mde)])))
-         (rf/dispatch [:mde/change (.value mde)])
+           (oget "codemirror")
+           (ocall :on "change" #(rf/dispatch [:mde/change (ocall mde :value)])))
+         (rf/dispatch [:mde/change (ocall mde :value)])
          (rf/dispatch [:viewport/resize nil])))
      :component-will-unmount
      (fn []

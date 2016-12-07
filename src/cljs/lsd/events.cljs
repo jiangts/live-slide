@@ -17,14 +17,14 @@
 (defstate ifload
   :start (let [ready (chan)
                iflm (IframeLoadMonitor. (gdom/getElement "slide-frame") true)
-               _ (ocall iflm :listen
-                        (aget IframeLoadMonitor "LOAD_EVENT")
-                        (fn []
-                          (js/setTimeout #(close! ready) 1234)))]
+               _ (.listen iflm
+                          (.-LOAD_EVENT IframeLoadMonitor)
+                          (fn []
+                            (js/setTimeout #(close! ready) 1234)))]
            [ready iflm])
   :stop (let [[ready iflm] @ifload]
           (close! ready)
-          (ocall iflm :dispose)))
+          (.dispose iflm)))
 
 (rf/reg-fx
   :update-slides
@@ -32,8 +32,8 @@
     (go
       (<! (first @ifload))
       (-> (gdom/getElement "slide-frame")
-        (aget "contentWindow")
-        (.setMarkdown md)))))
+        (oget "contentWindow")
+        (ocall :setMarkdown md)))))
 
 (rf/reg-event-fx
   :mde/change
@@ -46,7 +46,7 @@
   (fn [size]
     ;; yeah, pretty absurd
     (let [g gdom/getElementByClass
-          f #(aget % "offsetHeight")
+          f #(oget % "offsetHeight")
           left-pane (g "left-pane")
           code-mirror (g "CodeMirror")
           editor-statusbar (g "editor-statusbar")
