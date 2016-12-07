@@ -30,7 +30,7 @@
     :plugins      [[lein-figwheel "0.5.8"]
                    [lein-doo "0.1.7"]]
     ;; need to add dev source path here to get user.clj loaded
-    :source-paths ["src/cljs" "dev"]
+    :source-paths ["src/cljs" "src/clj" "dev"]
     ;; for CIDER
     ;; :plugins [[cider/cider-nrepl "0.12.0"]]
     :repl-options {; for nREPL dev you really need to limit output

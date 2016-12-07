@@ -1,17 +1,13 @@
 (ns lsd.views
   (:require [re-frame.core :as rf]
-            [reagent.core :as r]
-            [cljsjs.react-bootstrap]))
+            [reagent.core :as r])
+            [cljsjs.react-bootstrap]
+            [cljs.pprint :refer [pprint]])
+  (:require-macros [lsd.core :refer [require-react-reagent]])
 
-(def Navbar (r/adapt-react-class js/ReactBootstrap.Navbar))
-(def Navbar.Header (r/adapt-react-class js/ReactBootstrap.Navbar.Header))
-(def Navbar.Brand (r/adapt-react-class js/ReactBootstrap.Navbar.Brand))
-(def NavDropdown (r/adapt-react-class js/ReactBootstrap.NavDropdown))
-(def Navbar.Collapse (r/adapt-react-class js/ReactBootstrap.Navbar.Collapse))
-(def Nav (r/adapt-react-class js/ReactBootstrap.Nav))
-(def MenuItem (r/adapt-react-class js/ReactBootstrap.MenuItem))
-(def NavItem (r/adapt-react-class js/ReactBootstrap.NavItem))
-
+(require-react-reagent js/ReactBootstrap
+                       [Navbar Nav Navbar.Header Navbar.Brand Navbar.Collapse NavItem
+                        NavDropdown MenuItem NavItem])
 (defn left-nav []
   [Nav
    [NavItem {:event-key (gensym) :href "#"} "Link"]
@@ -61,5 +57,4 @@
    [navbar]
    [left-pane]
    [right-pane]])
-
 
