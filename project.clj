@@ -6,7 +6,8 @@
                  [re-frisk "0.3.1"]
                  [garden "1.3.2"]
                  [ns-tracker "0.3.0"]
-                 [mount "0.1.11"]]
+                 [mount "0.1.11"]
+                 [cljsjs/react-bootstrap "0.30.6-0"]]
 
   :plugins [[lein-cljsbuild "1.1.4"]
             [lein-garden "0.2.8"]]
@@ -29,7 +30,7 @@
     :plugins      [[lein-figwheel "0.5.8"]
                    [lein-doo "0.1.7"]]
     ;; need to add dev source path here to get user.clj loaded
-    :source-paths ["src/cljs" "dev"]
+    :source-paths ["src/cljs" "src/clj" "dev"]
     ;; for CIDER
     ;; :plugins [[cider/cider-nrepl "0.12.0"]]
     :repl-options {; for nREPL dev you really need to limit output
