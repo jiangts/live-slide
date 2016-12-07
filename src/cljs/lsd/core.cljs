@@ -1,5 +1,6 @@
 (ns lsd.core
-  (:require [reagent.core :as reagent]
+  (:require [mount.core :as mount :refer [defstate]]
+            [reagent.core :as reagent]
             [re-frame.core :as re-frame]
             [lsd.events]
             [lsd.subs]
@@ -19,4 +20,5 @@
 (defn ^:export init []
   (re-frame/dispatch-sync [:initialize-db])
   (dev-setup)
-  (mount-root))
+  (mount-root)
+  (mount/start))

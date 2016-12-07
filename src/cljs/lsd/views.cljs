@@ -1,11 +1,16 @@
 (ns lsd.views
   (:require [re-frame.core :as rf]
             [reagent.core :as r]
+            [mount.core :as mount :refer [defstate]]
             [cljsjs.react-bootstrap]
             [cljsjs.simplemde]
             [cljs.pprint :refer [pprint]]
-            [goog.dom :as gdom])
-  (:require-macros [lsd.core :refer [require-react-reagent slurp-dep]]))
+            [goog.events :as gevt]
+            [goog.dom :as gdom]
+            [oops.core :refer [oget oset! ocall oapply ocall! oapply!
+                               oget+ oset!+ ocall+ oapply+ ocall!+ oapply!+]])
+  (:require-macros [lsd.core :refer [require-react-reagent slurp-dep]])
+  (:import [goog.dom ViewportSizeMonitor]))
 
 (def RB js/ReactBootstrap)
 (def MDE js/SimpleMDE)
@@ -42,6 +47,14 @@
     #_[left-nav]
     [right-nav]]])
 
+(defstate vsw
+  :start (let [vsm (ViewportSizeMonitor.)
+               k (gevt/listen vsm gevt/EventType.RESIZE #(rf/dispatch [:viewport/resize %]))]
+           [vsm k])
+  :stop (let [[vsm k] @vsw]
+          (gevt/unlistenByKey k)
+          (ocall vsm :dispose)))
+
 (defn editor []
   (r/create-class
     {:display-name "editor"
@@ -51,17 +64,12 @@
                                  :shortcuts { :drawTable "Cmd-Alt-T" }}))]
          (-> mde
            (aget "codemirror")
-           ;; TODO OCALL
-           (.on "change" #(rf/dispatch [:mde/change (.value mde)]))))
-       ;; yeah, pretty absurd
-       (let [g gdom/getElementByClass
-             f #(aget % "offsetHeight")
-             left-pane (g "left-pane")
-             code-mirror (g "CodeMirror")
-             editor-statusbar (g "editor-statusbar")
-             editor-toolbar (g "editor-toolbar")
-             height (- (f left-pane) (+ (f editor-statusbar) (f editor-toolbar)))]
-         (aset code-mirror "style" "height" (str height "px"))))
+           (ocall :on "change" #(rf/dispatch [:mde/change (.value mde)])))
+         (rf/dispatch [:mde/change (.value mde)])
+         (rf/dispatch [:viewport/resize nil])))
+     :component-will-unmount
+     (fn []
+       (mount/stop "#'lsd.views/vsw"))
      :reagent-render
      (fn []
        [:div
